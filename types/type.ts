@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { Dispatch, ReactNode, SetStateAction } from "react";
 
 export type AuthCardType = { header: string; description: string };
 export type ChildrenType = {
@@ -11,4 +11,6 @@ export type InputType = {
   onHandleChange: (value: string) => void;
   placeholder: string;
   required?: boolean;
+  onShowPassword?: SetStateAction<Dispatch<boolean>>;
+  showPassword?: boolean;
 };

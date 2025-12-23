@@ -12,4 +12,7 @@ export default [
     route("login", "./auth/login.tsx"),
     // index("./auth/login.tsx"),
   ]),
+  layout("./dashboard/layout.tsx", [
+    route("reward", "./dashboard/reward/index.tsx"),
+  ]),
 ] satisfies RouteConfig;
