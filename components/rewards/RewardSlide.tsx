@@ -24,8 +24,11 @@ const RewardsPage = () => {
         aria-orientation="horizontal"
         className="ant-tabs-nav"
       >
-        <div className="ant-tabs-nav-wrap">
-          <div className="ant-tabs-nav-list relative" ref={listRef}>
+        <div className="ant-tabs-nav-wrap ant-tabs-nav-wrap-ping-right">
+          <div
+            className="ant-tabs-nav-list relative overflow-x-auto whitespace-nowrap scrollbar-hidden"
+            ref={listRef}
+          >
             {rewardSlides.map((sl, i) => {
               const active = i === activeIndex;
               return (

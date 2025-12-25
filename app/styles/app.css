@@ -162,6 +162,7 @@ svg:not(:host).svg-inline--fa {
   display: flex;
   flex: 1;
   overflow: hidden;
+  white-space: nowrap;
 }
 .ant-tabs > .ant-tabs-nav .ant-tabs-nav-list {
   display: flex;
