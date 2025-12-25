@@ -166,6 +166,7 @@ Open `http://localhost:5173`.
 
 ## 🔎 Assumptions & Trade-offs
 
+- **Name on the Signup**: Intentionally added the name field on the signup to maintain data consistency on the server, since i want to focus on building the rewards flow and not the entire app.
 - **Single currency**: All rewards consume `total_points` (no tiers/currencies).
 - **Claim ordering**: “Next to claim” is the first _unlocked_ reward by current sort (qualifying_points ascending). This is easy to reason about and matches typical gamification funnels.
 - **Client-side orchestration**: Atomic claim is done with two statements guarded by unique constraint + RLS, which is sufficient here. For heavier integrity needs, move to a Postgres function (`rpc`) or use Supabase’s `pg` transactions.
