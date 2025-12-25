@@ -3,14 +3,84 @@ import { FaAward, FaRegCalendar, FaUserPlus } from "react-icons/fa";
 import { HiGift } from "react-icons/hi2";
 import { PointsCard } from "./pointCard";
 import NumberProgress from "../progressBar";
-import { weekdays } from "constants/constant";
 import { BsLightning } from "react-icons/bs";
 import { CgCalendar } from "react-icons/cg";
 import { PointCount, Title } from "./points";
+import { useUser } from "hooks/useUser";
+import { RewardsCardsSkeleton } from "../rewardsSkeleton";
+import { dayRelation, formatNumber } from "lib/helpers";
+import { useRewardsDerived } from "hooks/useRewardDerived";
+import { buildWeekBadges } from "lib/streak-week";
+import { useState } from "react";
+import RewardConfirmModal from "../modal";
+import { claimStreakPoint } from "lib/rewards";
+import Spinner from "../spinner";
+import ClaimReclaimModal from "../claimModal";
+
 const Journey = () => {
+  const [claiming, setClaiming] = useState(false);
+  const [open, setOpen] = useState(false);
+
+  const [anchor, setAnchor] =
+    useState<import("components/ui/modal").Anchor>(null);
+  const [error, setError] = useState("");
+
+  const [openModal, setOpenModal] = useState(false);
+
+  async function handleSubmit({ email, file }: { email: string; file: File }) {
+    // TODO: upload `file` to Supabase storage, create row in `claims` table, etc.
+    // await supabase.storage.from('proofs').upload(...)
+    // await supabase.from('claims').insert({ email, proof_url, source: 'reclaim' })
+    // console.log({ email, file });
+  }
+
+  const { isLoading, data, refetch } = useUser();
+  const { nextToClaim, loading } = useRewardsDerived("All Rewards");
+
+  if (isLoading || loading) return <RewardsCardsSkeleton count={3} />;
+
+  const handleClaim = async (e: React.MouseEvent<HTMLButtonElement>) => {
+    // 1) Capture the anchor BEFORE any await
+    const rect = (e.currentTarget as HTMLButtonElement).getBoundingClientRect();
+    try {
+      setClaiming(true);
+      await claimStreakPoint();
+      await refetch();
+
+      setAnchor({ rect });
+      setOpen(true);
+    } catch (error: any) {
+      setOpen(true);
+      setError(error.message ?? error ?? "Failed");
+    } finally {
+      setClaiming(false);
+    }
+  };
+
+  const isToday = dayRelation(data.last_claimed_at) === "today";
+
   return (
     <div>
       <Title title=" Your Rewards Journey" />
+
+      <RewardConfirmModal
+        open={open}
+        status={error ? "error" : "success"} // or "error"
+        pointsText={error ? error : ""}
+        anchor={anchor}
+        onClose={() => {
+          setOpen(false);
+          setError("");
+        }}
+        title={error ? "Failed" : "Claimed"}
+      />
+
+      <ClaimReclaimModal
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        onSubmit={handleSubmit}
+        points={25}
+      />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <PointsCard
@@ -20,7 +90,7 @@ const Journey = () => {
         >
           <div className="p-4">
             <div className="flex justify-between items-center">
-              <PointCount point={"10"} />
+              <PointCount point={formatNumber(data?.total_points || 0)} />
               <img
                 src="/icons/gold-star.png"
                 alt="Star gold coin icon"
@@ -30,10 +100,16 @@ const Journey = () => {
 
             <div className="mt-4">
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-dark-300">Progress to $5 Gift Card</span>
-                <span className="text-dark-300 ">10/100</span>
+                <span className="text-dark-300">{nextToClaim?.name}</span>
+                <span className="text-dark-300 ">
+                  {formatNumber(data?.total_points || 0)} /{" "}
+                  {formatNumber(nextToClaim?.qualifying_points || 0)}
+                </span>
               </div>
-              <NumberProgress current={10} max={100} />
+              <NumberProgress
+                current={data?.total_points}
+                max={nextToClaim?.qualifying_points}
+              />
 
               <span className="text-dark-300 text-xs">
                 🚀 Just getting started — keep earning points!
@@ -42,32 +118,46 @@ const Journey = () => {
           </div>
         </PointsCard>
         <PointsCard
-          ICON={<FaRegCalendar className="text-[#70D6FF]" />}
+          ICON={<FaRegCalendar className="text-cyan-blue" />}
           label="Daily Streak"
         >
           <div className="p-4 flex flex-col gap-3">
-            <PointCount point={"2 days"} />
+            <PointCount point={`${data?.streaks || 0} days`} />
 
-            <div className="flex mt-4 space-x-1 justify-center">
-              {weekdays.map((w, i) => (
-                <div
-                  key={i}
-                  className={`${w.isClaimed ? "bg-[#70D6FF]! border-4 border-cyan-200 text-white" : w.isCurrentDay ? "ring-2 ring-primary-500 " : "  "} min-h-10 min-w-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200 bg-gray-200 text-gray-500`}
-                >
-                  {w.Title}
-                </div>
-              ))}
-            </div>
+            <WeeklyRow
+              streak={data?.streaks}
+              last_claimed_at={data?.last_claimed_at}
+            />
 
             <p className="text-sm text-gray-600 text-center mt-3">
               Check in daily to to earn +5 points
             </p>
-            <Button>
-              <div className="flex items-center justify-center gap-2">
-                <BsLightning />
-                <span>Claim Today's Points</span>
-              </div>
+            <Button disabled={isToday} onClick={(e) => handleClaim(e)}>
+              {claiming ? (
+                <span>
+                  <Spinner /> Claiming...
+                </span>
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <BsLightning />
+                  <span>
+                    {isToday
+                      ? "Claimed Today's points"
+                      : "Claim Today's Points"}
+                  </span>
+                </div>
+              )}
             </Button>
+            {/* <Button onClick={handlePopulate}>
+              {poulating ? (
+                <Spinner />
+              ) : (
+                <div className="flex items-center justify-center gap-2">
+                  <BsLightning />
+                  <span>Claim Today's Points</span>
+                </div>
+              )}
+            </Button> */}
           </div>
         </PointsCard>
         <PointsCard topDesign={false}>
@@ -114,13 +204,22 @@ const Journey = () => {
 
             <div className="px-4 py-1.25 flex justify-between items-center border border-t-light-100 border-b-0 border-r-0 border-l-0">
               <div>
-                <Button>
-                  <FaUserPlus />
-                  Sign up
-                </Button>
+                <a
+                  href="https://reclaim.ai/?utm_campaign=partnerstack&utm_term=ps_16ee8d9da128&pscd=go.reclaim.ai&ps_partner_key=MTZlZThkOWRhMTI4&ps_xid=a2wCEJSBqYOl5I&gsxid=a2wCEJSBqYOl5I&gspk=MTZlZThkOWRhMTI4"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <Button>
+                    <FaUserPlus />
+                    Sign up
+                  </Button>
+                </a>
               </div>
               <div>
-                <Button className="bg-[linear-gradient(45deg,#9013FE,#FF8687)]! text-sm!">
+                <Button
+                  className="bg-[linear-gradient(45deg,#9013FE,#FF8687)]! text-sm!"
+                  onClick={() => setOpenModal(true)}
+                >
                   <HiGift />
                   Claim 50 points
                 </Button>
@@ -134,3 +233,36 @@ const Journey = () => {
 };
 
 export default Journey;
+
+// const WeekList
+
+const WeeklyRow = ({
+  streak,
+  last_claimed_at,
+}: {
+  streak: number;
+  last_claimed_at?: string | null;
+}) => {
+  const weekdays = buildWeekBadges(streak, last_claimed_at);
+
+  return (
+    <div className="flex mt-4 space-x-1 justify-center">
+      {weekdays.map((w, i) => (
+        <div
+          key={i}
+          className={[
+            "min-h-10 min-w-10 rounded-full flex items-center justify-center text-sm font-semibold transition-all duration-200",
+            w.isCurrentDay
+              ? "ring-2 ring-primary-500 bg-gray-200 text-gray-700"
+              : w.isClaimed
+                ? "bg-cyan-blue text-white border-4 border-cyan-200"
+                : "bg-gray-200 text-gray-500",
+          ].join(" ")}
+          title={w.date}
+        >
+          {w.Title}
+        </div>
+      ))}
+    </div>
+  );
+};

@@ -86,11 +86,13 @@ export const getUsers = async () => {
   }
 };
 
-export const getUserById = async (id: string) => {
+export const getUserById = async (id?: string) => {
+  const session = await getSession();
+  const userId = session.user.id;
   const { data, error } = await supabase
     .from("users")
     .select()
-    .eq("id", id)
+    .eq("id", userId)
     .maybeSingle();
 
   if (error) {
@@ -100,6 +102,7 @@ export const getUserById = async (id: string) => {
 
   return data;
 };
+
 export const updateUser = async (id: string, value: any) => {
   const { data, error } = await supabase
     .from("users")
@@ -115,3 +118,25 @@ export const updateUser = async (id: string, value: any) => {
 
   return data;
 };
+
+export const getSession = async () => {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session) {
+    const error = {
+      status: 401,
+      message: "ou need to login first!",
+    };
+    console.error("Invalid session:", error);
+    // redirect("/login");
+    throw error;
+  }
+
+  return session;
+};
+
+// export const subtractUserPoint =async()=> {
+
+// }

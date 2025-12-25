@@ -1,9 +1,27 @@
 import { LuUsers } from "react-icons/lu";
 import { Title } from "./points";
-import { IoCopyOutline } from "react-icons/io5";
+import { IoCopyOutline, IoCheckmark } from "react-icons/io5";
 import { Socials } from "constants/constant";
+import { useUser } from "hooks/useUser";
+import { RewardsCardsSkeleton } from "../rewardsSkeleton";
+import { copyToClipboard } from "lib/helpers";
+import { useState } from "react";
 
 const ReferEarn = () => {
+  const { isLoading, data } = useUser();
+  const [copied, setCopied] = useState(false);
+
+  const handleCopy = async (tx: string) => {
+    try {
+      await copyToClipboard(tx);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (error) {}
+    // Optionally show a toast notification here
+  };
+
+  if (isLoading) return <RewardsCardsSkeleton count={3} />;
+
   return (
     <div className="space-y-6">
       <Title title="Refer & Earn" />
@@ -26,8 +44,11 @@ const ReferEarn = () => {
         <div className="p-4">
           <div className="space-y-6">
             <div className="flex justify-between mb-4">
-              <RefPoinEarned name="Referrals" point={0} />
-              <RefPoinEarned name="Points Earned" point={0} />
+              <RefPoinEarned name="Referrals" point={data?.ref_count || 0} />
+              <RefPoinEarned
+                name="Points Earned"
+                point={data?.ref_points || 0}
+              />
             </div>
           </div>
         </div>
@@ -43,8 +64,17 @@ const ReferEarn = () => {
               className="flex-1  border border-gray-300 rounded-md px-3 py-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent w-full pr-10"
               value={"https://app.flowvahub.com/signup/?ref=lucky1932"}
             />
-            <button className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer z-10">
-              <IoCopyOutline className="text-primary-500 " size={20} />
+            <button
+              className="absolute right-2.5 top-1/2 -translate-y-1/2 cursor-pointer z-10"
+              onClick={() =>
+                handleCopy("https://app.flowvahub.com/signup/?ref=lucky1932")
+              }
+            >
+              {copied ? (
+                <IoCheckmark className="text-green-500" size={20} />
+              ) : (
+                <IoCopyOutline className="text-primary-500" size={20} />
+              )}
             </button>
           </div>
         </div>
@@ -53,14 +83,21 @@ const ReferEarn = () => {
           {Socials.map((so, i) => {
             const { Icon, url, color } = so;
             return (
-              <button
-                className="w-7.5 h-7.5 rounded-full flex items-center justify-center text-[18px] transition-transform duration-200 hover:translate-y-0.75"
-                style={{
-                  color,
-                }}
+              <a
+                href={so.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                key={i}
               >
-                {<Icon size={24} />}
-              </button>
+                <button
+                  className="w-7.5 h-7.5 rounded-full flex items-center justify-center text-[18px] transition-transform duration-200 hover:translate-y-0.75"
+                  style={{
+                    color,
+                  }}
+                >
+                  {<Icon size={24} />}
+                </button>
+              </a>
             );
           })}
         </div>

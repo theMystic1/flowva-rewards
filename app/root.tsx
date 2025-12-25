@@ -6,9 +6,14 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { Toaster } from "sonner";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 import type { Route } from "./+types/root";
 import "../app/styles/app.css";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NavProvider } from "contexts/nav-contsxt";
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -42,7 +47,34 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        staleTime: 30_000,
+        refetchOnWindowFocus: false,
+        retry: 2,
+      },
+    },
+  });
+
+  return (
+    <QueryClientProvider client={queryClient}>
+      <NavProvider>
+        <Outlet />;
+      </NavProvider>
+      <Toaster position="top-right" richColors closeButton />;
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        hideProgressBar={false} // show the progress bar
+        newestOnTop
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="light"
+      />
+    </QueryClientProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

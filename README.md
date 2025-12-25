@@ -1,87 +1,153 @@
-# Welcome to React Router!
+# Flowva Rewards Hub 🏆
 
-A modern, production-ready template for building full-stack React applications using React Router.
-
-[![Open in StackBlitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/github/remix-run/react-router-templates/tree/main/default)
+## Overview
+Flowva Rewards is a professional gamification platform and rewards management system built with **TypeScript** and **Node.js** using the **React Router v7** framework. It leverages **Supabase** as a robust backend-as-a-service to manage authentication, real-time data synchronization, and atomic point transactions for user growth and retention.
 
 ## Features
-
-- 🚀 Server-side rendering
-- ⚡️ Hot Module Replacement (HMR)
-- 📦 Asset bundling and optimization
-- 🔄 Data loading and mutations
-- 🔒 TypeScript by default
-- 🎉 TailwindCSS for styling
-- 📖 [React Router docs](https://reactrouter.com/)
+- **Authentication**: Secure onboarding via Supabase Auth, supporting both Google OAuth and traditional Email/Password credentials.
+- **Streak Engine**: A logic-heavy daily check-in system that tracks user consistency and awards incremental points based on activity logs.
+- **Referral Tracking**: Dynamic generation of unique referral codes with automated point allocation for successful invitations.
+- **Atomic Reward Redemption**: Secure "claim" functionality that ensures point-to-reward transactions are atomic and synchronized with the database state.
+- **Optimistic UI Management**: Real-time interface updates powered by TanStack Query for a zero-latency user experience during point claims.
+- **Responsive Architecture**: A mobile-optimized dashboard built with Tailwind CSS v4 and Framer Motion for smooth transitions.
 
 ## Getting Started
 
 ### Installation
+1. **Clone the Repository**
+   ```bash
+   git clone <repository-url>
+   cd flowva-rewards
+   ```
 
-Install the dependencies:
+2. **Install Dependencies**
+   ```bash
+   npm install
+   ```
 
-```bash
-npm install
+3. **Development Mode**
+   ```bash
+   npm run dev
+   ```
+
+4. **Production Build**
+   ```bash
+   npm run build
+   npm run start
+   ```
+
+### Environment Variables
+To run this project, you must configure the following environment variables in a `.env` file located in the root directory:
+
+| Variable | Example | Description |
+| :--- | :--- | :--- |
+| `VITE_SUPABASE_URL` | `https://xyz.supabase.co` | Your Supabase project URL |
+| `VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY` | `eyJhbGciOiJIUzI1NiI...` | Your Supabase anonymous/public API key |
+
+## API Documentation
+
+### Base URL
+`https://[your-supabase-project].supabase.co`
+
+### Endpoints
+
+#### GET /auth/user
+**Request**:
+Handled via `supabase.auth.getSession()` and the `useUser` hook. Requires a valid JWT in the local storage.
+
+**Response**:
+```json
+{
+  "id": "uuid",
+  "email": "user@example.com",
+  "user_metadata": {
+    "name": "John Doe",
+    "avatar_url": "https://..."
+  }
+}
 ```
 
-### Development
+**Errors**:
+- 401: Unauthorized session or expired token.
 
-Start the development server with HMR:
-
-```bash
-npm run dev
+#### POST /api/v1/auth/register
+**Request**:
+```json
+{
+  "email": "user@example.com",
+  "password": "StrongPassword123",
+  "name": "John Doe"
+}
 ```
 
-Your application will be available at `http://localhost:5173`.
-
-## Building for Production
-
-Create a production build:
-
-```bash
-npm run build
+**Response**:
+```json
+{
+  "user": { "id": "uuid", "email": "..." },
+  "session": { "access_token": "...", "refresh_token": "..." }
+}
 ```
 
-## Deployment
+**Errors**:
+- 400: User already exists or weak password.
 
-### Docker Deployment
-
-To build and run using Docker:
-
-```bash
-docker build -t my-app .
-
-# Run the container
-docker run -p 3000:3000 my-app
+#### POST /api/v1/rewards/claim
+**Request**:
+```json
+{
+  "reward_id": "string",
+  "user_id": "string"
+}
 ```
 
-The containerized application can be deployed to any platform that supports Docker, including:
-
-- AWS ECS
-- Google Cloud Run
-- Azure Container Apps
-- Digital Ocean App Platform
-- Fly.io
-- Railway
-
-### DIY Deployment
-
-If you're familiar with deploying Node applications, the built-in app server is production-ready.
-
-Make sure to deploy the output of `npm run build`
-
-```
-├── package.json
-├── package-lock.json (or pnpm-lock.yaml, or bun.lockb)
-├── build/
-│   ├── client/    # Static assets
-│   └── server/    # Server-side code
+**Response**:
+```json
+{
+  "status": "success",
+  "points_remaining": 4500,
+  "transaction_id": "uuid"
+}
 ```
 
-## Styling
+**Errors**:
+- 403: Insufficient qualifying points.
+- 409: Reward already claimed.
 
-This template comes with [Tailwind CSS](https://tailwindcss.com/) already configured for a simple default starting experience. You can use whatever CSS framework you prefer.
+## Technologies Used
+| Category | Technology |
+| :--- | :--- |
+| **Framework** | [React Router v7](https://reactrouter.com/) |
+| **Language** | [TypeScript](https://www.typescriptlang.org/) |
+| **Database/Auth** | [Supabase](https://supabase.com/) |
+| **State Management** | [TanStack Query](https://tanstack.com/query) |
+| **Styling** | [Tailwind CSS v4](https://tailwindcss.com/) |
+| **Animation** | [Framer Motion](https://www.framer.com/motion/) |
+| **DevOps** | [Docker](https://www.docker.com/) |
 
----
+## Usage
+The application is divided into two primary contexts: authentication and the dashboard. 
 
-Built with ❤️ using React Router.
+1. **Authentication Flow**: Users must sign up to generate a `ref_code`. The `AuthLayout` automatically checks for active sessions and redirects authenticated users to the rewards hub.
+2. **The Journey**: Found in the dashboard, this section displays the point balance and progress bars. Users can click "Claim Today's Points" once every 24 hours. The logic checks the `last_claimed_at` timestamp to prevent double-claiming.
+3. **Rewards Redemption**: Users can browse active rewards. The "Claim" button is enabled only if the user's `total_points` meet or exceed the `qualifying_points` for that specific item.
+4. **Referral Management**: Users can copy their unique referral link. Sharing is integrated with WhatsApp, X (Twitter), LinkedIn, and Facebook via social sharing hooks.
+
+## Contributing
+- 🚀 Fork the repository and create your feature branch.
+- 📝 Ensure all TypeScript types are correctly defined in `types/type.ts`.
+- 🧪 Run `npm run typecheck` before submitting a pull request.
+- 📬 Open a PR with a detailed description of your changes.
+
+## Author
+**[Your Name]**
+- [LinkedIn](https://linkedin.com/in/placeholder)
+- [Twitter](https://twitter.com/placeholder)
+- [Portfolio](https://placeholder.com)
+
+## Dynamic Badges
+![Build Status](https://img.shields.io/badge/Build-Passing-brightgreen)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue?logo=typescript)
+![Supabase](https://img.shields.io/badge/Backend-Supabase-3ECF8E?logo=supabase)
+![Docker](https://img.shields.io/badge/Container-Docker-2496ED?logo=docker)
+
+[![Readme was generated by Dokugen](https://img.shields.io/badge/Readme%20was%20generated%20by-Dokugen-brightgreen)](https://www.npmjs.com/package/dokugen)

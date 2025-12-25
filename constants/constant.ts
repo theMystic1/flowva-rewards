@@ -1,16 +1,16 @@
-export const slides = ["Earn points", "Redeem rewards"];
 import { FaFacebook, FaLinkedin, FaTwitter } from "react-icons/fa";
+import { FaXTwitter } from "react-icons/fa6";
 import { IoLogoWhatsapp } from "react-icons/io";
 
 export const Socials = [
   {
     Icon: FaFacebook,
-    url: "facebook.com/sharer/sharer.php?quote=🚀%20Join%20me%20on%20Flowva!%0AFlowva%20is%20where%20I%20discover%20top%20tools%2C%20earn%20rewards%2C%20and%20grow%20with%20community%20power.%0A%0AUse%20my%20referral%20link%20to%20sign%20up%20and%20get%20rewarded%20too%3A%0Ahttps%3A%2F%2Fapp.flowvahub.com%2Fsignup%2F%3Fref%3Dlucky1932",
+    url: "https://facebook.com/sharer/sharer.php?quote=🚀%20Join%20me%20on%20Flowva!%0AFlowva%20is%20where%20I%20discover%20top%20tools%2C%20earn%20rewards%2C%20and%20grow%20with%20community%20power.%0A%0AUse%20my%20referral%20link%20to%20sign%20up%20and%20get%20rewarded%20too%3A%0Ahttps%3A%2F%2Fapp.flowvahub.com%2Fsignup%2F%3Fref%3Dlucky1932",
     color: "#1877f2",
   },
   {
     url: "https://x.com/intent/post?text=%F0%9F%9A%80%20Join%20me%20on%20Flowva!%0AFlowva%20is%20where%20I%20discover%20top%20tools%2C%20earn%20rewards%2C%20and%20grow%20with%20community%20power.%0A%0AUse%20my%20referral%20link%20to%20sign%20up%20and%20get%20rewarded%20too%3A%0Ahttps%3A%2F%2Fapp.flowvahub.com%2Fsignup%2F%3Fref%3Dlucky1932",
-    Icon: FaTwitter,
+    Icon: FaXTwitter,
     color: "#000000",
   },
   {
@@ -73,5 +73,25 @@ export const weekdays = [
     isCurrentDay: false,
     isClaimed: true,
     date: "",
+  },
+];
+export const slides = ["Earn points", "Redeem rewards"];
+
+export const rewardSlides = [
+  {
+    slide: "All Rewards",
+    count: 8,
+  },
+  {
+    slide: "Unlocked",
+    count: 0,
+  },
+  {
+    slide: "Locked",
+    count: 0,
+  },
+  {
+    slide: "Coming Soon",
+    count: 0,
   },
 ];

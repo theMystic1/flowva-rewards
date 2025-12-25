@@ -2,10 +2,18 @@ import type { ChildrenType } from "types/type";
 import { Title } from "./points";
 import { BiStar } from "react-icons/bi";
 import { IoShareSocialSharp } from "react-icons/io5";
+import { useState } from "react";
+import ShareStackModal from "../shareStackModal";
 
 const EarnMore = () => {
+  const [openStackModal, setOpenStackModal] = useState(false);
+
   return (
     <div className="space-y-6">
+      <ShareStackModal
+        open={openStackModal}
+        onClose={() => setOpenStackModal(false)}
+      />
       <Title title="Earn More Points" />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -35,7 +43,10 @@ const EarnMore = () => {
             <div>
               <p className="font-semibold  text-sm ">Share your tool stack</p>
             </div>
-            <button className="bg-primary-100 hover:text-white hover:bg-primary-500 text-primary-500 py-2 px-4 rounded-full font-semibold text-sm transition-all duration-200 inline-flex items-center gap-2 border-0">
+            <button
+              className="bg-primary-100 hover:text-white hover:bg-primary-500 text-primary-500 py-2 px-4 rounded-full font-semibold text-sm transition-all duration-200 inline-flex items-center gap-2 border-0"
+              onClick={() => setOpenStackModal(true)}
+            >
               <IoShareSocialSharp size={20} />
               Share
             </button>

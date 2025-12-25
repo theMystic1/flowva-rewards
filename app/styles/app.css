@@ -22,6 +22,10 @@
   --color-white: #ffffff;
   --color-light-100: #f3f4f6;
   --color-light-200: #ede9fe;
+
+  /* LIGHT BLUE */
+
+  --color-cyan-blue: #70d6ff;
 }
 
 body {
@@ -89,6 +93,10 @@ button {
   50% {
     transform: scale(1.1);
   } /* Scales up to 110% */
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out;
 }
 
 .animate-pulse-scale {
