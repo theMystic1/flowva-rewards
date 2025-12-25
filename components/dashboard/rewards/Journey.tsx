@@ -141,9 +141,7 @@ const Journey = () => {
                 <div className="flex items-center justify-center gap-2">
                   <BsLightning />
                   <span>
-                    {isToday
-                      ? "Claimed Today's points"
-                      : "Claim Today's Points"}
+                    {isToday ? "Claimed Today" : "Claim Today's Points"}
                   </span>
                 </div>
               )}
