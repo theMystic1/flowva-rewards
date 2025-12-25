@@ -1,4 +1,4 @@
-import Reward from "components/rewards/rewards";
+import Reward from "components/dashboard/rewards/rewards";
 
 const Dashboard = () => {
   return <Reward />;

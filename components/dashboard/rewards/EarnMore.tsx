@@ -1,9 +1,9 @@
 import type { ChildrenType } from "types/type";
-import { Title } from "./points";
 import { BiStar } from "react-icons/bi";
 import { IoShareSocialSharp } from "react-icons/io5";
 import { useState } from "react";
-import ShareStackModal from "../shareStackModal";
+import ShareStackModal from "components/ui/shareStackModal";
+import { Title } from "./points";
 
 const EarnMore = () => {
   const [openStackModal, setOpenStackModal] = useState(false);

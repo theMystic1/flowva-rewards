@@ -1,4 +1,4 @@
-import SideNav, { MobileNav } from "components/ui/dashboard/sidenav";
+import SideNav, { MobileNav } from "components/dashboard/rewards/sidenav";
 import { LoadingUi } from "components/ui/loading";
 import { useNavContext } from "contexts/nav-contsxt";
 import { useUser } from "hooks/useUser";
@@ -11,6 +11,8 @@ const DashboardLayout = () => {
   const navigate = useNavigate();
 
   if (isLoading) return <LoadingUi />;
+
+  // console.log(data);
 
   if (!data) navigate("/login");
 

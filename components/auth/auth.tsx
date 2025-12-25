@@ -107,8 +107,6 @@ const AuthCard = ({ header, description }: AuthCardType) => {
 
       if (!user?.name) {
         const usrData = await updateUser(user?.id, { name: value.name });
-
-        console.log(usrData);
       }
 
       navigate("/reward");

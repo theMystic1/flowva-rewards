@@ -1,5 +1,5 @@
-import RewardsHeader from "components/ui/dashboard/header";
-import PointRewards from "components/ui/dashboard/points-rewards";
+import RewardsHeader from "./header";
+import PointRewards from "./points-rewards";
 
 const Reward = () => {
   return (

@@ -2,20 +2,20 @@ import Button from "components/auth/btn";
 import { FaAward, FaRegCalendar, FaUserPlus } from "react-icons/fa";
 import { HiGift } from "react-icons/hi2";
 import { PointsCard } from "./pointCard";
-import NumberProgress from "../progressBar";
 import { BsLightning } from "react-icons/bs";
 import { CgCalendar } from "react-icons/cg";
-import { PointCount, Title } from "./points";
 import { useUser } from "hooks/useUser";
-import { RewardsCardsSkeleton } from "../rewardsSkeleton";
 import { dayRelation, formatNumber } from "lib/helpers";
 import { useRewardsDerived } from "hooks/useRewardDerived";
 import { buildWeekBadges } from "lib/streak-week";
 import { useState } from "react";
-import RewardConfirmModal from "../modal";
 import { claimStreakPoint } from "lib/rewards";
-import Spinner from "../spinner";
-import ClaimReclaimModal from "../claimModal";
+import { RewardsCardsSkeleton } from "components/ui/rewardsSkeleton";
+import { PointCount, Title } from "./points";
+import RewardConfirmModal from "components/ui/modal";
+import ClaimReclaimModal from "components/ui/claimModal";
+import NumberProgress from "components/ui/progressBar";
+import Spinner from "components/ui/spinner";
 
 const Journey = () => {
   const [claiming, setClaiming] = useState(false);

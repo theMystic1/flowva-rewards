@@ -3,9 +3,9 @@ import { Title } from "./points";
 import { IoCopyOutline, IoCheckmark } from "react-icons/io5";
 import { Socials } from "constants/constant";
 import { useUser } from "hooks/useUser";
-import { RewardsCardsSkeleton } from "../rewardsSkeleton";
 import { copyToClipboard } from "lib/helpers";
 import { useState } from "react";
+import { RewardsCardsSkeleton } from "components/ui/rewardsSkeleton";
 
 const ReferEarn = () => {
   const { isLoading, data } = useUser();

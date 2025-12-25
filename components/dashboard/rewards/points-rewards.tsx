@@ -1,8 +1,8 @@
-import Points from "./points";
 import { slides } from "constants/constant";
-import RewardsSlide from "components/rewards/RewardSlide";
+import RewardsSlide from "components/dashboard/rewards/RewardSlide";
 import { useSlider } from "hooks/useSlider";
 import SideNav from "./sidenav";
+import Points from "./points";
 
 export default function PointRewards() {
   const { activeIndex, ink, setTabRef, setActiveIndex, listRef } = useSlider();
