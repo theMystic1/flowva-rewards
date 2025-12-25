@@ -22,11 +22,18 @@ export function useRewardsDerived(filter: FilterType) {
     const unclaimed = rewards.filter((r) => !claimed.has(r?.id!));
     const next = unclaimed[0] ?? null;
 
-    const Locked = unclaimed.filter(
-      (r) => r.id !== next.id || r.status === "incoming"
-    );
+    const isEnoughToPay =
+      (meQ.data?.total_points || 0) >= next?.qualifying_points;
+
     const claimedRewards = rewards.filter((r) => claimed.has(r?.id!));
-    const unlocked = [...claimedRewards, next];
+    let unlocked = [...claimedRewards];
+
+    if (isEnoughToPay) unlocked = [...claimedRewards, next];
+
+    const Locked = isEnoughToPay
+      ? unclaimed.filter((r) => r.id !== next.id || r.status === "incoming")
+      : unclaimed;
+
     const soon = rewards.filter((r) => r.status === "incoming");
     let v: RewardType[] = rewards;
     if (filter === "Locked") v = Locked;

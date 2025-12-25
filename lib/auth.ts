@@ -127,10 +127,10 @@ export const getSession = async () => {
   if (!session) {
     const error = {
       status: 401,
-      message: "ou need to login first!",
+      message: "you need to login first!",
     };
     console.error("Invalid session:", error);
-    // redirect("/login");
+    redirect("/login");
     throw error;
   }
 

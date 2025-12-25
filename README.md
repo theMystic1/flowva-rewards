@@ -32,9 +32,9 @@ A professional gamification and rewards experience built with **TypeScript** and
 ```
 src/
   app/
-   auth/               # login/signup + layout
-   dashboard/          # Dashboard -> Rewards
-   routes.tsx
+    auth/               # login/signup + layout
+    dashboard/          # Dashboard -> layouts -> Rewards
+    routes.tsx
   components/
     ui/                # buttons, inputs, skeletons, modal, toast adapter
   hooks/

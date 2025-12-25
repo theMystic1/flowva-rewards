@@ -1,3 +1,4 @@
+// app/root.tsx (or ./app.tsx depending on your structure)
 import {
   isRouteErrorResponse,
   Links,
@@ -5,15 +6,33 @@ import {
   Outlet,
   Scripts,
   ScrollRestoration,
+  Link,
 } from "react-router";
-import { Toaster } from "sonner";
+import type { Route } from "./+types/root";
+
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { NavProvider } from "contexts/nav-contsxt";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-import type { Route } from "./+types/root";
 import "../app/styles/app.css";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { NavProvider } from "contexts/nav-contsxt";
+
+/* -----------------------------------------------------------------------------
+ * React Query: module-level singleton (safe across re-renders/HMR)
+ * --------------------------------------------------------------------------- */
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      staleTime: 30_000,
+      refetchOnWindowFocus: false,
+      retry: 2,
+    },
+    mutations: {
+      retry: 0,
+    },
+  },
+});
 
 export const links: Route.LinksFunction = () => [
   { rel: "preconnect", href: "https://fonts.googleapis.com" },
@@ -30,7 +49,7 @@ export const links: Route.LinksFunction = () => [
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -41,34 +60,30 @@ export function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        {/* Optional portal roots for modals/overlays (prevent runtime creation) */}
+        <div id="modal-root" />
+        <div id="toast-root" />
       </body>
     </html>
   );
 }
 
 export default function App() {
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        staleTime: 30_000,
-        refetchOnWindowFocus: false,
-        retry: 2,
-      },
-    },
-  });
-
   return (
     <QueryClientProvider client={queryClient}>
       <NavProvider>
-        <Outlet />;
+        {/* Your app routes render here */}
+        <Outlet />
       </NavProvider>
-      <Toaster position="top-right" richColors closeButton />;
+
+      {/* Keep one toast system. React-Toastify includes a progress bar by default. */}
       <ToastContainer
         position="top-right"
         autoClose={4000}
-        hideProgressBar={false} // show the progress bar
+        hideProgressBar={false}
         newestOnTop
         closeOnClick
+        pauseOnFocusLoss
         pauseOnHover
         draggable
         theme="light"
@@ -78,30 +93,63 @@ export default function App() {
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
-  let message = "Oops!";
-  let details = "An unexpected error occurred.";
-  let stack: string | undefined;
+  // Defaults
+  let title = "Something went wrong";
+  let message = "An unexpected error occurred.";
+  let code: number | undefined;
+  let devStack: string | undefined;
 
+  // Handle thrown/returned responses
   if (isRouteErrorResponse(error)) {
-    message = error.status === 404 ? "404" : "Error";
-    details =
+    code = error.status;
+    title = error.status === 404 ? "Page not found" : `Error ${error.status}`;
+    message =
       error.status === 404
-        ? "The requested page could not be found."
-        : error.statusText || details;
-  } else if (import.meta.env.DEV && error && error instanceof Error) {
-    details = error.message;
-    stack = error.stack;
+        ? "The page you are looking for doesn’t exist."
+        : error.statusText || message;
+  } else if (error instanceof Error) {
+    // Generic errors
+    message = error.message || message;
+    if (import.meta.env.DEV && error.stack) devStack = error.stack;
   }
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
-      <h1>{message}</h1>
-      <p>{details}</p>
-      {stack && (
-        <pre className="w-full p-4 overflow-x-auto">
-          <code>{stack}</code>
-        </pre>
-      )}
+    <main className="mx-auto max-w-3xl px-4 py-16">
+      <div className="rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+        <h1 className="text-2xl font-semibold text-slate-900">{title}</h1>
+        <p className="mt-2 text-slate-600">{message}</p>
+        {typeof code === "number" && (
+          <p className="mt-1 text-sm text-slate-500">Status code: {code}</p>
+        )}
+
+        <div className="mt-6 flex gap-3">
+          <button
+            onClick={() =>
+              typeof window !== "undefined" ? window.location.reload() : null
+            }
+            className="inline-flex h-10 items-center rounded-lg bg-slate-900 px-4 text-sm font-medium text-white hover:bg-slate-800"
+          >
+            Reload
+          </button>
+          <Link
+            to="/"
+            className="inline-flex h-10 items-center rounded-lg border border-slate-300 bg-white px-4 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Go Home
+          </Link>
+        </div>
+
+        {devStack && (
+          <details className="mt-6">
+            <summary className="cursor-pointer text-sm text-slate-500">
+              Stack trace (dev only)
+            </summary>
+            <pre className="mt-3 max-w-full overflow-auto rounded-lg bg-slate-50 p-4 text-xs leading-relaxed text-slate-700">
+              <code>{devStack}</code>
+            </pre>
+          </details>
+        )}
+      </div>
     </main>
   );
 }

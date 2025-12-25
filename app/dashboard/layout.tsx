@@ -2,13 +2,17 @@ import SideNav, { MobileNav } from "components/ui/dashboard/sidenav";
 import { LoadingUi } from "components/ui/loading";
 import { useNavContext } from "contexts/nav-contsxt";
 import { useUser } from "hooks/useUser";
-import { Outlet } from "react-router";
+import { Outlet, useNavigate } from "react-router";
 
 const DashboardLayout = () => {
   const { isLoading, data } = useUser();
   const { open } = useNavContext();
 
+  const navigate = useNavigate();
+
   if (isLoading) return <LoadingUi />;
+
+  if (!data) navigate("/login");
 
   return (
     <div className="flex flex-col md:flex-row min-h-dvh lg:h-screen  lg:md:overflow-hidden w-full  ">

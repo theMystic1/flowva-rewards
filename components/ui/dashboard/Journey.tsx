@@ -57,7 +57,7 @@ const Journey = () => {
     }
   };
 
-  const isToday = dayRelation(data.last_claimed_at) === "today";
+  const isToday = dayRelation(data?.last_claimed_at) === "today";
 
   return (
     <div>
