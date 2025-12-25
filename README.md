@@ -57,7 +57,7 @@ src/
 ### 1) Clone & Install
 
 ```bash
-git clone <your-repo-url>
+git clone https://github.com/theMystic1/flowva-rewards.git
 cd flowva-rewards
 npm install
 ```
@@ -106,6 +106,8 @@ Add to `.env`:
 ```bash
 VITE_SUPABASE_URL="https://<YOUR_PROJECT>.supabase.co"
 VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY="<PUBLIC_ANON_KEY>"
+VITE_GOOGLE_AUTH_CLIENTID="<CLIENT_ID>"
+SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_SECRET="<CLIENT_SECRET>"
 ```
 
 **Local OAuth redirect** (Supabase): `http://localhost:5173/login` (add in Auth settings allowlist).
@@ -202,8 +204,8 @@ npm run typecheck # TypeScript checks
 
 ## 👤 Author
 
-**Your Name**  
-[LinkedIn](https://linkedin.com/in/placeholder) · [Twitter](https://twitter.com/placeholder) · [Portfolio](https://placeholder.com)
+**Lucky Chukwujekwu**  
+[LinkedIn](https://www.linkedin.com/in/lucky-chukwujekwu-a6650727a/) · [Twitter](https://x.com/__ugochukwu/) · [Portfolio](https://chukwujekwu-portfolio.vercel.app/)
 
 ---
 
