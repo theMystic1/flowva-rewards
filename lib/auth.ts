@@ -5,7 +5,7 @@ export const signinWithOAuth = async () => {
   const { error } = await supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: "http://localhost:5173/reward",
+      redirectTo: "https://themystic-flowva-rewards.vercel.app/reward",
       queryParams: {
         prompt: "select_account",
         // Optional: Add access_type: 'offline' if you need a refresh token
