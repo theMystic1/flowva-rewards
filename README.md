@@ -16,14 +16,14 @@ A professional gamification and rewards experience built with **TypeScript** and
 
 ## 🧱 Tech Stack
 
-| Area          | Choice                                  |
-|---------------|------------------------------------------|
-| Framework     | React Router v7 + TypeScript             |
-| Backend/DB    | Supabase (Postgres, RLS, Auth)           |
-| Data Fetching | TanStack Query                           |
-| Styling       | Tailwind CSS v4                          |
-| Animations    | Framer Motion (micro-transitions only)   |
-| Tooling       | Vite                                     |
+| Area          | Choice                                 |
+| ------------- | -------------------------------------- |
+| Framework     | React Router v7 + TypeScript           |
+| Backend/DB    | Supabase (Postgres, RLS, Auth)         |
+| Data Fetching | TanStack Query                         |
+| Styling       | Tailwind CSS v4                        |
+| Animations    | Framer Motion (micro-transitions only) |
+| Tooling       | Vite                                   |
 
 ---
 
@@ -31,6 +31,10 @@ A professional gamification and rewards experience built with **TypeScript** and
 
 ```
 src/
+  app/
+   auth/               # login/signup + layout
+   dashboard/          # Dashboard -> Rewards
+   routes.tsx
   components/
     ui/                # buttons, inputs, skeletons, modal, toast adapter
   hooks/
@@ -42,9 +46,7 @@ src/
     supabase.ts        # browser client
     auth.ts            # getSession/getUser helpers
     rewards.ts         # reward queries + atomic claim mutation
-  routes/
-    auth/              # login/signup + layout
-    dashboard/         # rewards hub
+
   types/type.ts        # shared types (User, Reward, Claim)
 ```
 
@@ -53,6 +55,7 @@ src/
 ## ⚙️ Setup & Local Development
 
 ### 1) Clone & Install
+
 ```bash
 git clone <your-repo-url>
 cd flowva-rewards
@@ -60,6 +63,7 @@ npm install
 ```
 
 ### 2) Supabase Project & Tables
+
 Create a Supabase project, then in **Table Editor** create:
 
 - **users** (extends `auth.users` profile)
@@ -87,6 +91,7 @@ Create a Supabase project, then in **Table Editor** create:
   - **Unique** constraint on `(user_id, reward_id)` to prevent duplicates.
 
 **RLS**: enable Row Level Security and add policies:
+
 - `users`: users can `select`/`update` only their own row.
 - `user_rewards`: users can `select` their rows; can `insert` rows where `user_id = auth.uid()`; cannot insert if `(user_id, reward_id)` already exists (the unique constraint catches this and we surface a friendly error).
 - `rewards`: readable by all authenticated (or public if desired).
@@ -94,6 +99,7 @@ Create a Supabase project, then in **Table Editor** create:
 > You can also seed sample rewards via the Supabase SQL editor, or use the dashboard UI to insert records.
 
 ### 3) Auth Providers (Google)
+
 In **Authentication → Providers → Google**, add your client id/secret.
 Add to `.env`:
 
@@ -105,9 +111,11 @@ VITE_SUPABASE_PUBLISHABLE_DEFAULT_KEY="<PUBLIC_ANON_KEY>"
 **Local OAuth redirect** (Supabase): `http://localhost:5173/login` (add in Auth settings allowlist).
 
 ### 4) Run
+
 ```bash
 npm run dev
 ```
+
 Open `http://localhost:5173`.
 
 ---
@@ -157,7 +165,7 @@ Open `http://localhost:5173`.
 ## 🔎 Assumptions & Trade-offs
 
 - **Single currency**: All rewards consume `total_points` (no tiers/currencies).
-- **Claim ordering**: “Next to claim” is the first *unlocked* reward by current sort (qualifying_points ascending). This is easy to reason about and matches typical gamification funnels.
+- **Claim ordering**: “Next to claim” is the first _unlocked_ reward by current sort (qualifying_points ascending). This is easy to reason about and matches typical gamification funnels.
 - **Client-side orchestration**: Atomic claim is done with two statements guarded by unique constraint + RLS, which is sufficient here. For heavier integrity needs, move to a Postgres function (`rpc`) or use Supabase’s `pg` transactions.
 - **RLS over backend**: We rely on RLS instead of a custom server. This simplifies deployment for the assessment and still demonstrates secure data access.
 
