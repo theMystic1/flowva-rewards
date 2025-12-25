@@ -1,15 +1,22 @@
 import { nav } from "constants/nav";
 import { useNavContext } from "contexts/nav-contsxt";
+import { handleLogout } from "lib/auth";
+import { useState } from "react";
 import { CgClose } from "react-icons/cg";
 import { useLocation, useNavigate } from "react-router";
+import { toast } from "react-toastify";
 import type { UserType } from "types/type";
 
 const SideNav = ({ user }: { user?: UserType }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [open, setOpen] = useState(false);
 
   return (
-    <aside className="w-72 overflow-x-hidden hidden lg:flex flex-col h-screen shadow-md border-r border-black/10 text-black font-sans">
+    <aside
+      className="w-72 overflow-x-hidden hidden lg:flex flex-col h-screen shadow-md border-r border-black/10 text-black font-sans"
+      onClick={() => setOpen(false)}
+    >
       <div className="flex flex-col h-full">
         <div className=" p-2 px-7  my-2 flex justify-start">
           <img
@@ -38,11 +45,17 @@ const SideNav = ({ user }: { user?: UserType }) => {
             })}
           </ul>
         </nav>
-
+        {open ? <ProfileModal onClose={() => setOpen(false)} /> : false}
         <div className="mt-auto py-3 relative flex justify-center">
           <div className="absolute top-0 left-4 right-4 border-t border-[#64748B]" />
           <div className="w-full flex items-center justify-between px-4">
-            <button className="flex items-center border-none">
+            <button
+              className="flex items-center border-none"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(true);
+              }}
+            >
               <div className="w-10 h-10 relative overflow-hidden rounded-full font-semibold mr-3 flex items-center justify-center  text-primary-500 bg-primary-200">
                 <img
                   src={
@@ -74,6 +87,7 @@ export default SideNav;
 export const MobileNav = ({ user }: { user?: UserType }) => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  const [openNav, setOpenNav] = useState(false);
 
   const { open, setOpen } = useNavContext();
 
@@ -122,6 +136,7 @@ export const MobileNav = ({ user }: { user?: UserType }) => {
               })}
             </ul>
           </nav>
+          {openNav ? <ProfileModal onClose={() => setOpenNav(false)} /> : false}
 
           <div className="mt-auto py-3 relative flex justify-center">
             <div className="absolute top-0 left-4 right-4 border-t border-[#64748B]" />
@@ -150,6 +165,46 @@ export const MobileNav = ({ user }: { user?: UserType }) => {
           </div>
         </div>
       </aside>
+    </div>
+  );
+};
+
+const ProfileModal = ({ onClose }: { onClose: () => void }) => {
+  const [loggingOut, setLoggingOut] = useState(false);
+  const navigate = useNavigate();
+  const handleClientLogout = async () => {
+    setLoggingOut(false);
+    try {
+      await handleLogout();
+      toast.success("Logout successful");
+      navigate("/login");
+      onClose();
+    } catch (error: any) {
+      console.error(error);
+      toast.error(error.message || error || "Logout Failed");
+    } finally {
+      setLoggingOut(true);
+    }
+  };
+  return (
+    <div className="absolute bottom-16 left-6 w-56 bg-white border-primary-500 border text-black rounded-lg shadow-lg z-1000">
+      <ul className="px-4 py-2">
+        <li className="px-4 py-2 cursor-pointer hover:bg-[rgba(144,19,254,0.1)] rounded-lg">
+          Feedback
+        </li>
+        <button className=" border-none w-full text-start px-4 py-2 cursor-pointer hover:bg-[rgba(144,19,254,0.1)] rounded-lg">
+          Support
+        </button>
+        <li
+          className="px-4 py-2 cursor-pointer hover:bg-[rgba(255,107,107,0.1)] hover:text-[#FF6B6B] rounded-lg"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleClientLogout();
+          }}
+        >
+          {loggingOut ? "Logging out..." : "Log Out"}
+        </li>
+      </ul>
     </div>
   );
 };

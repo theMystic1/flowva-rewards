@@ -136,7 +136,3 @@ export const getSession = async () => {
 
   return session;
 };
-
-// export const subtractUserPoint =async()=> {
-
-// }
